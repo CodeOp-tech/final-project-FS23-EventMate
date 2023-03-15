@@ -5,8 +5,15 @@ class ClientAPI {
     return await this._doFetch("/api");
   }
 
-  static async _doFetch(url, method = "GET", body = null) {
-    let options = {
+  // To be updated later to actually get matched users for now it just gets all users
+  static async getMatchedUsers() {
+    return await this._doFetch(`/api/users/matched`);
+  };
+
+  
+  static async _doFetch(url, method = 'GET', body = null) {
+
+    let options = { 
       method,
       headers: {},
     };
