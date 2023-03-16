@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Grid from "@mui/material/Grid";
 import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -11,13 +11,19 @@ import LanguageDropdown from "./LanguageDropdown";
 import LocationDropdown from "./LocationDropdown";
 import InterestsDropdown from "./InterestsDropdown";
 import UploadImage from "./UploadImage";
+import ClientAPI from "../../helpers/ClientAPI";
+import Local from "../../helpers/Local";
 
 export default function RegistrationForm() {
+  async function updateUser(form) {
+    const userId = Local.getUserId();
+    ClientAPI.updateUser(form, userId);
+  }
+
   return (
     <Form
       submit={(form) => {
-        // TODO: data for submit
-        console.log("FORM", form);
+        updateUser(form);
       }}
       formInitialValues={{
         age: "",

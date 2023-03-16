@@ -8,10 +8,32 @@ export default function UploadImage({ name }) {
   const formContext = useContext(FormContext);
   const { handleFormChange } = formContext;
   const [images, setImages] = React.useState([]);
-  const maxNumber = 1; // Can update to reflect more than one later
+  let formData = new FormData();
 
+  const maxNumber = 1; // Can update to reflect more than one later
+  async function uploadFile(formData) {
+    let options = {
+      method: "POST",
+      body: formData,
+    };
+
+    try {
+      let response = await fetch("/api/files", options);
+      if (response.ok) {
+        // Server responds with updated array of files
+        let data = await response.json();
+      } else {
+        console.log(`Server error: ${response.status}: ${response.statusText}`);
+      }
+    } catch (err) {
+      console.log(`Network error: ${err.message}`);
+    }
+  }
   const onChange = (imageList, addUpdateIndex) => {
-    handleFormChange({}, { name: name, value: imageList[0].file.name });
+    formData.append("clientfile", imageList[0].file, imageList[0].file.name);
+    //uploadFile(formData);
+
+    handleFormChange(undefined, { name: name, value: formData });
     setImages(imageList);
   };
   return (

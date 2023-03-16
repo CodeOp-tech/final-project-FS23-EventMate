@@ -7,20 +7,6 @@ const multer = require("multer");
 
 const PUBLIC_DIR_URL = "http://localhost:5001/clientfiles";
 
-/**
- * Multer initialization
- **/
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./public/clientfiles"); // store files here
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname); // keep original filename
-  },
-});
-const upload = multer({ storage });
-
 async function sendAllFiles(res) {
   try {
     let results = await db("SELECT * FROM files");
@@ -36,11 +22,18 @@ async function sendAllFiles(res) {
 }
 
 /**
- * Routes
+ * Multer initialization
  **/
-router.get("/files", async function (req, res) {
-  res.send({ welcome: "welcome" });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/clientfiles"); // store files here
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname); // keep original filename
+  },
 });
+const upload = multer({ storage });
 
 /* POST a file */
 router.post("/files", upload.single("clientfile"), async function (req, res) {

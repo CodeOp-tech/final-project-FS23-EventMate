@@ -20,7 +20,6 @@ router.get("/user/:id", async (req, res) => {
   }
 });
 
-
 router.get("/", async function (req, res, next) {
   let sql = "SELECT * FROM users ORDER BY username";
 
@@ -93,17 +92,16 @@ router.post("/", async (req, res) => {
 });
 
 // For secondary registration page
-router.put("/user/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   let userId = req.params.id;
-  let sql = `SELECT * FROM users WHERE userId = ${userId}`
+  let sql = `SELECT * FROM users WHERE userId = ${userId}`;
 
   try {
     let results = await db(sql);
-    
+
     if (results.data.length === 0) {
       res.status(404).send({ error: "User not found" });
     } else {
-      
       let {
         age,
         gender,
@@ -112,9 +110,8 @@ router.put("/user/:id", async (req, res) => {
         languages,
         interests,
         about,
-        avatarURL
+        avatarURL,
       } = req.body;
-
 
       let sql = `
         UPDATE users
@@ -128,7 +125,7 @@ router.put("/user/:id", async (req, res) => {
         about = "${about}",
         avatarURL = "${avatarURL}"
         WHERE userId = "${userId}"
-      `
+      `;
       await db(sql);
       let results = await db(`SELECT * FROM users WHERE userId = ${userId}`);
       res.send(results.data);
