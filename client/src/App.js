@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, {useState} from "react";
 import TopNav from "./components/TopNav";
 import UserListView from "./components/UserListView";
+import Home from "./components/Home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import RegistrationForm from "./components/Registration/RegistrationForm";
 import "./App.css";
 import ChooseEvents from "./components/ChooseEvents";
 import FormInput from "./components/FormInput";
 import Local from "./helpers/Local";
 import ClientAPI from "./helpers/ClientAPI";
-import { Route, Routes, useNavigate } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
 
 //<RegistrationForm />
@@ -57,10 +58,14 @@ function App() {
     <>
       <TopNav user={user} logOutCb={doLogout} />
       <main>
-        {/* <RegistrationForm /> */}
-        <LoginForm registrationMessage={isRegistrationSuccessful} />
-        {/* <ChooseEvents /> */}
+      <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/matched" element={<UserListView />} />
+      <Route path="/register" element={<RegistrationForm />}/>
+      <Route path="/events" element={<ChooseEvents />}/>
+      </Routes>
       </main>
+     
     </>
   );
 }
