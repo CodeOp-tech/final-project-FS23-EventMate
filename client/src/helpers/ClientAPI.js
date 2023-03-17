@@ -6,17 +6,16 @@ class ClientAPI {
     return await this._doFetch("/users/matched");
   }
 
-  //Update User (more details)
-  static async updateUser(body, userId) {
-    return await this._doFetch(`/users/${userId}`, "PUT", body);
-  }
-
   //register
   static async registerUser(username, password, email) {
     let body = { username, password, email };
     return await this._doFetch("/register", "POST", body);
   }
 
+  //Update User (more details)
+  static async updateUser(body, userId) {
+    return await this._doFetch(`/users/${userId}`, "PUT", body);
+  }
   //login
   static async loginUser(username, password) {
     let body = { username, password };

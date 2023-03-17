@@ -20,7 +20,7 @@ class Local {
       return "";
     }
     let user = JSON.parse(userjson);
-    return user.id;
+    return user.userId;
   }
   static getUserName() {
     let userjson = localStorage.getItem("user");

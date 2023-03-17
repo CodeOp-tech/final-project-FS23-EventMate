@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 import { GetByLocTM } from "../ApiCalls/GetByLocTM";
 import Checkbox from '@mui/material/Checkbox';
 import "./chooseEvents.css"
-import { Button, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 
-function ChooseEvents() {
+function SearchEvents() {
       const [location, setLocation] = useState(); // save location
       const [events, setEvents] = useState(); 
       const [showEvents, setShowEvents] = useState(false);
       const [showEdit, setShowEdit]= useState(false);
       const [showTitle, setShowTitle]= useState(true);
-      const [chosenEvents, setChosenEvents] = useState([]);
-      const [isChecked, setIsChecked]= useState([]); 
+      const [checkedItems, setCheckedItems] = useState([]);
+   
 
     //Loads with user's current country in DB     
     useEffect(() => {
@@ -41,7 +41,7 @@ function ChooseEvents() {
         setShowTitle(false);
     }  
 
-    async function handleFormLocation(e){
+    async function handleSubmit(e){
         e.preventDefault();
         await getEvents(location)
         console.log("events set as:", events)
@@ -53,49 +53,27 @@ function ChooseEvents() {
     async function getEvents(place){
         let results = await GetByLocTM(location);
         //formatting the object to only take what we need
-       
-    let newResults= results.map((result) =>{ 
+    let newResults= results.map((result) =>{
         return {"id": result.id, 
         "name":result.name, 
         "image": result.images["0"].url, 
         "date" : result.dates.start.localDate, 
         "time" : result.dates.start.localTime, 
         "venue" : result._embedded.venues["0"].name}});
+
         console.log("new Results" , newResults)
         await setEvents(newResults);
-        setShowEvents(true);    
+        setShowEvents(true);
     }
 
-  
 
-   function handleCheckBoxChange(event){
-      let eventId= event.target.value;
-      let checkedEvents= [...chosenEvents]
-      if (checkedEvents.includes(eventId)){
-        let idIndex= checkedEvents.indexOf(eventId);
-        checkedEvents.splice(idIndex,1);
-        setChosenEvents(checkedEvents);
-      }else {
-        checkedEvents.push(eventId)
-        setChosenEvents(checkedEvents);
-      }
-      console.log(chosenEvents);
-   }
-
-   function handleSend (){
-    //here goes put request put(chosenEvents)
-    // loading
-    //if return is successful - success message
-    // route to next page
-    console.log("submitted events:", chosenEvents)
-  }
 
   return (
     <div className="choose-events">
 
 { showEdit &&
        <div className="edit-location">
-        <form className= "edit-loc-form" onSubmit={e => handleFormLocation(e)}>
+        <form className= "edit-loc-form" onSubmit={e => handleSubmit(e)}>
         <h2>Events in </h2>
         <TextField id="standard-basic" label="city" variant="standard" 
               placeholder="enter your location"
@@ -104,6 +82,8 @@ function ChooseEvents() {
               value={location}
               onChange={e => handleChange(e)}
             />
+
+
           {/* <button className="edit" type="submit">
             ✓
           </button> */}
@@ -128,8 +108,6 @@ function ChooseEvents() {
               <Checkbox
                 className="event-checkbox"
                 value={r.id}
-                // checked={checked}
-                onChange={handleCheckBoxChange}
                 inputProps={{
                     'aria-label': 'Checkbox A',
                 }}
@@ -145,15 +123,9 @@ function ChooseEvents() {
          </div>
          }
 
-         <div className="next-bar">
-        <Button 
-        className="next-button" 
-        variant="contained"
-        onClick={(e)=>handleSend()}
-        >Next</Button>
-        </div>
+
     </div>
   )
 }
 
-export default ChooseEvents
+export default SearchEvents
