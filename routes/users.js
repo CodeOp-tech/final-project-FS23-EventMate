@@ -5,7 +5,6 @@ const { ensureSameUser } = require("../middleware/guards");
 
 // Had to change from :id to /user/:id to stop conflicting with other routes
 router.get("/user/:id", async (req, res) => {
-  let id = req.params.id;
   let sql = `select * from users where userId = ${id}`;
 
   let results = await db(sql);
@@ -34,8 +33,7 @@ router.get("/", async function (req, res, next) {
   }
 });
 
-// Will eventually get all users matched on an event --- Not sure if this'll be needed we could
-// just use get all users for the event id on other table without the current user
+// Will eventually get all users matched on an event
 router.get("/matched", async function (req, res, next) {
   let sql = "SELECT * FROM users";
 
@@ -43,7 +41,7 @@ router.get("/matched", async function (req, res, next) {
     let results = await db(sql);
     let users = results.data;
     if (users.length === 0) {
-      res.status(404).send({ error: "No matches found" });
+      res.status(404).send({ error: "No users found" });
     } else {
       users.forEach((u) => delete u.password); // don't return passwords
       res.send(users);
@@ -52,51 +50,6 @@ router.get("/matched", async function (req, res, next) {
     res.status(500).send({ error: err.message });
   }
 });
-
-function giantConnectionSQL(id){
-  let sql = 
-  `SELECT connections.connectId, 
-          connections.accepted,
-          inviter.userId as inviterId, 
-          inviter.username as inviterUsername,
-          invitee.userId as inviteeId, 
-          invitee.username as inviteeUsername,
-          events.eventid,
-          events.eventname,
-          events.eventdate,
-          events.eventlocation
-    FROM connections
-    INNER JOIN users inviter 
-    ON connections.inviterId = inviter.userId
-    INNER JOIN users invitee 
-    ON connections.inviteeId = invitee.userId 
-    INNER JOIN events 
-    ON connections.eventId = events.eventid 
-    WHERE connections.inviterId = ${id} 
-    OR connections.inviteeId=${id}`
-  return sql
-}
-
-// Connections
-// accepted - 1= confirmed, 0= rejected, null= not dealt with yet
-router.get("/connects/:id", async function (req, res, next) {
-  let userId = req.params.id;
-  let sql = giantConnectionSQL(userId);
-
-  try {
-    let results = await db(sql);
-    let connections = results.data;
-    console.log(connections);
-    if (connections.length === 0) {
-      res.status(404).send({ error: "No connections" });
-    } else {
-      res.send(connections);
-    }
-  } catch (err) {
-    res.status(500).send({ error: err.message });
-  }
-});
-
 
 router.get("/:id", ensureSameUser, async (req, res) => {
   let userId = req.params.id;
@@ -139,7 +92,7 @@ router.post("/", async (req, res) => {
 });
 
 // For secondary registration page
-router.put("/user/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   let userId = req.params.id;
   let sql = `SELECT * FROM users WHERE userId = ${userId}`;
 
@@ -181,74 +134,5 @@ router.put("/user/:id", async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 });
-
-
-// New Invite
-router.post("/invite", async (req, res) => {
-  let {
-    inviterId,
-    inviteeId,
-    eventId,
-  } = req.body;
-  
-  try {
-    let sql = `
-      SELECT * FROM connections 
-      WHERE inviterId = ${inviterId} 
-      AND inviteeId = ${inviteeId}
-      AND eventId = ${eventId}`;
-    
-      let results = await db(sql);
-
-    if (results.data.length === 1) {
-      res.status(400).send({ message: `Invite already exists` });
-    } else {
-      let sql = `
-      INSERT INTO connections(inviterId, inviteeId, eventId) 
-      VALUES(${inviterId}, ${inviteeId}, ${eventId}) `;
-      
-      await db(sql);
-      let results = await db(giantConnectionSQL(inviterId));
-      
-      res.status(201).send(results);
-    }
-  } catch (err) {
-    res.status(500).send({ err: err.message });
-  }
-});
-
-// Update invite - accept or reject
-router.put("/invite", async (req, res) => {
-  let {
-    connectId,
-    inviterId,
-    accepted
-  } = req.body;
-
-  let sql = `
-      SELECT * FROM connections 
-      WHERE connectId = ${connectId}`;
-  
-  try {
-    let results = await db(sql);
-
-    if (results.data.length === 0) {
-      res.status(404).send({ error: "Invite not found" });
-    } else {
-      let sql = `
-      UPDATE connections
-      SET
-      accepted = ${accepted}
-      WHERE connectId = "${connectId}"`;
-
-      await db(sql);
-      let results = await db(giantConnectionSQL(inviterId));
-      res.send(results.data);
-    }
-  } catch (err) {
-    res.status(500).send({ error: err.message });
-  }
-});
-
 
 module.exports = router;

@@ -9,7 +9,9 @@ class Local {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
   }
-
+  static updateUserInfo(user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  }
   static removeUserInfo(token, user) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");

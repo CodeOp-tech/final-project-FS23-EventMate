@@ -5,7 +5,6 @@ export default async function manageEventDetails (objectids, object){
 
     if (objectids.includes(object.id)){
    let eventID= object.id
-   //add user id check here to make sure it really is a duplicate??
    let eventExists= await ClientAPI.getEventDetails(eventID)
     if (eventExists.data !== null){
         console.log( "event with id: "  + object.id + " already in db");

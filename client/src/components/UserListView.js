@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Local from "../helpers/Local";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -19,47 +18,23 @@ export default function UserListView() {
 
   const [matched, setMatched] = useState([]);
   const [open, setOpen] = useState(false);
-  const [matchClicked, setMatchClicked] = useState([]);
+  const [matchClicked, setMatchClicked] = useState(false);
 
   useEffect(() => {
     getMatched();
-    console.log(matched);
   }, []);
 
   async function getMatched() {
-    //Get all events in the events list that I'm going to
-    //Get all users going to those events - excluding me
-
-    let matchesToAdd = [];
-
-    let eResponse = await ClientAPI.getUserEvents(Local.getUserId());
-    if (eResponse.ok) {
-
-      if (eResponse.data.length > 0) {
-        for (let row of eResponse.data) {
-          let usersResponse = await ClientAPI.getEventUsers(row.ticketmasterid);
-          let users = usersResponse.data;
-          let otherUsers = users.filter(user => {
-            return user.userId !== Local.getUserId()
-          });
-
-          if (otherUsers.length > 0) {
-            matchesToAdd.push(...otherUsers);
-          } 
-        }
-      }
-      
+    let uresponse = await ClientAPI.getMatchedUsers();
+    if (uresponse.ok) {
+      setMatched(uresponse.data);
     } else {
-      console.log("Error!", eResponse.error);
+      console.log("Error!", uresponse.error);
     }
-
-    //console.log("To Add: ", matchesToAdd);
-    setMatched(matchesToAdd);
-    //console.log("Matched: ", matched);
   }
 
   const handleClickOpen = (matchPass) => {
-    //console.log("t----", matchPass);
+    console.log("----", matchPass);
     setMatchClicked(matchPass);
     setOpen(true);
   };
@@ -87,11 +62,12 @@ export default function UserListView() {
           bgcolor: "background.paper",
         }}
       >
-        {matched.length > 0 &&
+        {matched &&
           matched.map((match) => (
             <div>
               <ListItem
                 key={match.userId}
+                onClick={(e) => handleClickOpen(match)}
               >
                 <ListItemAvatar
                   sx={{
@@ -117,32 +93,7 @@ export default function UserListView() {
                   }
                 />
 
-                <Button 
-                  variant="outlined"
-                  onClick={() => {
-                    handleClickOpen(match.userId);
-                  }}
-                >
-                  View Profile
-                </Button>
-
-                <Button 
-                  variant="outlined"
-                  onClick={() => {
-                    ClientAPI.invite(Local.getUserId(), match.userId, match.eventId);
-                    let mCopy = [...matched];
-                    let pos = matched.indexOf(match);
-                    console.log("pos: ", pos)
-                    mCopy.splice(pos, 1);
-                    setMatched(mCopy);
-                    //message to say you have invited so and so
-                  }}
-                >
-                  Invite
-                </Button>
-
-
-
+                <Button variant="outlined">Invite</Button>
               </ListItem>
               <Divider component="li" />
 
@@ -150,19 +101,12 @@ export default function UserListView() {
                 <UserDialogView
                   open={open}
                   onClose={handleClose}
-                  userId={matchClicked}
+                  matchClicked={matchClicked}
                 />
               )}
             </div>
           ))}
-
-
-          {
-            matched.length <= 0 && 
-            <div>No Matches Found</div>
-          }
       </List>
-      
       <NextBar
         activeStep={3}
         prevCb={() => {
