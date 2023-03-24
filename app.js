@@ -27,7 +27,7 @@ app.use("/api/users", usersRouter);
 app.use("/api", authRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/events", eventsRouter);
-app.use("/api", filesRouter);
+app.use("/api/files", filesRouter);
 
 app.get("/api/events", (req, res) => {
   res.json("Hello, welcome to the events table");
@@ -43,6 +43,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.send({ error: err.message });
 });
-
 
 module.exports = app;

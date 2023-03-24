@@ -5,7 +5,7 @@ const db = require("../model/helper");
 const fs = require("fs/promises");
 const multer = require("multer");
 
-const PUBLIC_DIR_URL = "http://localhost:5001/clientfiles";
+const PUBLIC_DIR_URL = "http://localhost:5002/clientfiles";
 
 async function sendAllFiles(res) {
   try {
@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* POST a file */
-router.post("/files", upload.single("clientfile"), async function (req, res) {
+router.post("/", upload.single("clientfile"), async function (req, res) {
   let { originalname } = req.file;
 
   try {
