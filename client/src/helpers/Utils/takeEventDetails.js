@@ -56,7 +56,8 @@ export default function takeEventDetails (eventData,location){
             "subgenre": subg,
             "eventType": evType,
             "eventHost": evHost,
-            "eventLocation": evLocation
+            "eventLocation": evLocation,
+            "showAdd": true
         }
 
 

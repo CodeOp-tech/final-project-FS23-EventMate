@@ -8,7 +8,23 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-function EventsDisplayModal({ isOpen, handleOpen, eventData }) {
+import Local from "../helpers/Local";
+import addEventsToDB from "../helpers/Utils/addEventsToDB";
+
+
+function EventsDisplayModal({ isOpen, handleOpen, eventData}) {
+const userInfo = Local.getUser()
+const userId= userInfo.userId
+const [addedToEvents, setAddedToEvents]= useState(false);
+
+ async function handleMyEvents(){
+  let response= await addEventsToDB(eventData.id, eventData, userId)
+ if (response){
+    setAddedToEvents(true)
+    eventData.showAdd=(false)
+ }
+  }
+
   const style = {
     position: "absolute",
     top: "50%",
@@ -19,6 +35,13 @@ function EventsDisplayModal({ isOpen, handleOpen, eventData }) {
     border: "2px solid #000",
     boxShadow: 24,
   };
+
+
+  const openInNewTab = (url) => {
+    window.open(url, '_blank', 'noreferrer');
+    console.log(url)
+  };
+
   console.warn(eventData);
   return (
     <Modal
@@ -52,10 +75,27 @@ function EventsDisplayModal({ isOpen, handleOpen, eventData }) {
                   {eventData.eventType} Event, {eventData.genre},
                   {eventData.subgenre}
                 </p>
-                <Button href={eventData.purchaseLink} target="_blank">
-                  Purchase Tickets Online
-                </Button>
-                <Button>add to my events</Button>
+
+               { eventData.purchaseURL &&
+                <Button
+                 variant="contained" size= "small" href={eventData.purchaseURL} target="_blank" 
+                onClick={(e) => openInNewTab(`${eventData.purchaseURL}`)}>
+                  Purchase Tickets
+                </Button> 
+                }
+
+                { eventData.showAdd &&
+                <Button color= "secondary" variant="contained" 
+                onClick={e => handleMyEvents()}>my events +</Button>
+                }
+                { !addedToEvents && !eventData.showAdd &&
+                <Button size= "small" color= "secondary"> my event</Button>
+                }
+                 { addedToEvents &&
+                <Button size= "small"  color= "secondary" > added!</Button>
+                }
+
+
               </Typography>
             </CardContent>
           </CardActionArea>

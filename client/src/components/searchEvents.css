@@ -1,0 +1,52 @@
+.edit-loc-form {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    justify-content: start;
+    align-items: baseline;
+    column-gap: 10px;
+  }
+  
+  button.edit {
+    width: 40px;
+    height: 30px;
+  }
+  
+  /* ---------------------------------------------------------------- */
+  .title {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: start;
+    align-items: baseline;
+  }
+
+
+  button.edit {
+    width: 40px;
+    height: 30px;
+    margin-left: 10px;
+  }
+  
+  .event-items {
+    display: flex;
+  }
+  .results-choose-events {
+    columns: 1;
+  }
+  @media (max-width: 725px) {
+    .results-choose-events {
+      columns: 1;
+    }
+  }
+  .choose-events {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .choose-events form {
+    margin-left: 20px;
+  }
+  .btns-cards {
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 10px;
+  }
