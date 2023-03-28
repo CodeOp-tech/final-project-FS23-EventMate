@@ -20,10 +20,18 @@ export default function Form({
   const handleFormChange = (event, formData) => {
     // If user is clicking on html el instead of form el,
     // take formData values not event.target
+    // If it equals ""
+    let value;
+    if (formData !== undefined) {
+      value = formData.value;
+    } else if (event.target.value === "") {
+      value = event.target.value;
+    } else {
+      value = event.target.value;
+    }
     const updatedForm = {
       ...form,
-      [event.target?.name || formData.name]:
-        event.target?.value || formData.value,
+      [event?.target.name || formData.name]: value,
     };
     console.log("Form updated", updatedForm);
     //Callback

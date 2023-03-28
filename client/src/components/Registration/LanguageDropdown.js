@@ -20,7 +20,7 @@ export default function LanguageDropdown({ label, placeholder, name }) {
         multiple
         onChange={(event, newValue) => {
           const values = newValue.map((value) => value.name);
-          handleFormChange(event, { name: name, value: values || null });
+          handleFormChange(undefined, { name: name, value: values || null });
         }}
         value={defaultValues || null}
         options={languages}
